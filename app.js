@@ -3,6 +3,7 @@ const mongoose = require ("mongoose")
 const cors = require ("cors")
 const bcrypt = require ("bcryptjs")
 const {blogmodel} = require ("./models/blog")
+const jwt = require ("jsonwebtoken")
 
 const app = express()
 app.use(cors())
@@ -39,7 +40,18 @@ app.post("/signin",(req,res)=>{
 
                         if (isMatch) {
 
-                            res.json({"status":"success","userId":response[0]._id})
+                           jwt.sign({email:input.emailid},"blog-app",{expiresIn:"1d"},
+                            (error,token)=>{
+                                    if (error) {
+                                        res.json({"status":"Unable to create token"})
+                                        
+                                    } else {
+
+                                        res.json({"status":"success","userId":response[0]._id,"token":token})
+                                        
+                                    }
+                            }
+                           )
                             
                         } else {
                             res.json({"status":"incorrect"})
